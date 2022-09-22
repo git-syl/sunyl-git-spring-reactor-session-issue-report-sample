@@ -1,0 +1,47 @@
+spring:
+  redis:
+    host: localhost
+    lettuce:
+      pool:
+        max-active: 1000
+        max-idle: 100
+        max-wait: 2000
+        min-idle: 8
+      shutdown-timeout: 6000
+    port: 6379
+    timeout: 6s
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+  codec:
+    max-in-memory-size: 100MB
+
+  application:
+    name: reactor-project-gateway
+
+server:
+  port: 8051
+
+
+
+
+
+logging:
+  level:
+    dev.miku.r2dbc.mysql.QUERY: info # for queries
+    dev.miku.r2dbc.mysql.QUERY.PARAM: info # for parameters
+    dev.miku.r2dbc.mysql: debug # for parameters
+    org.springframework.r2dbc: info
+    org.springframework.transaction: info
+    org.springframework.data.r2dbc.connectionfactory: info
+    root: info
+
+
+
+
+
+
+
+
