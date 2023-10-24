@@ -29,15 +29,14 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        log.info("onAuthenticationSuccess");
-        log.info( "{}，已登录。",authentication.getName() );
+        log.debug("onAuthenticationSuccess");
+        log.info( "{} ,login success。",authentication.getName() );
 
         if (request.getSession() != null) {
-            log.info("GetMaxInactiveInterval:{} getId:{}" , request.getSession().getMaxInactiveInterval(),
-                    request.getSession().getId()
-            );
+            log.debug("GetMaxInactiveInterval:{} getId:{}" , request.getSession().getMaxInactiveInterval(),
+                    request.getSession().getId());
         } else {
-            log.info("request.getSession() is null");
+            log.debug("request.getSession() is null");
         }
 
         response.setContentType("application/json");

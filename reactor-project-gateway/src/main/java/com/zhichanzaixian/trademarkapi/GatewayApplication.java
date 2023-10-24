@@ -6,10 +6,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * test version
+ *
+ *
+ * [make sure redis is running]:
+ * <p>
+ * docker run --name test-redis-login -p 0.0.0.0:6379:6379 -d redis
+ *
  */
 @Slf4j
 @SpringBootApplication
@@ -20,21 +27,17 @@ public class GatewayApplication {
     }
 
 //    @Bean
+//    public ReactiveRedisConnectionFactory connectionFactory() {
+//        return new LettuceConnectionFactory("localhost", 6379);
+//    }
+
+//    @Bean
 //    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
 //        return new Jackson2JsonRedisSerializer<>(Object.class);
 //    }
 
 
 
-    @Bean
-    public RouteLocator testRouteLocator(RouteLocatorBuilder builder) {
-        // 关键代码下面几行
-        return builder.routes()
-                .route("test_rewritepath_route", r ->
-                        r.path("/testfoo/**").filters(f -> f.rewritePath("/testfoo/(?<segment>.*)", "/$\\{segment}"))
-                                .uri("http://www.baidu.com"))
-                .build();
-    }
 
 
 

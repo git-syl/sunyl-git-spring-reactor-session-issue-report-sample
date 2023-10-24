@@ -4,9 +4,8 @@ import com.zhichanzaixian.trademarkapi.api.LoginClient;
 import com.zhichanzaixian.trademarkapi.api.ReactorClient;
 import com.zhichanzaixian.trademarkapi.api.request.LoginRequest;
 import feign.Response;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,44 +16,60 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by syl nerosyl@live.com on 2022/9/21
+ * <p>
+ * [make sure redis is running]:
+ * <p>
+ * docker run --name test-redis-login -p 0.0.0.0:6379:6379 -d redis
  *
- * @author syl
  */
 @Slf4j
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SessionTest {
 
+
+    //http-client
     @Autowired
     LoginClient loginClient;
 
+    //http-client
     @Autowired
-    ReactorClient redactorClient;
+    ReactorClient reactorClient;
 
 
     @PostConstruct
     public void wareUp() throws InterruptedException {
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            new Thread(() -> userLogin("ware-Up-"+ finalI)).start();
+            new Thread(() -> userLoginThenAccessReactorProject("ware-Up-"+ finalI)).start();
         }
         TimeUnit.SECONDS.sleep(20);
 
     }
 
 
-    @Test
+    /**
+     * <p>
+     * [make sure redis is running]:
+     * <p>
+     * docker run --name test-redis-login -p 0.0.0.0:6379:6379 -d redis
+     * <p>
+     * ----This may need to be run multiple times. Seems to be a concurrency problem.
+     *
+     */
+    @RepeatedTest(3)
     void mainTest() throws InterruptedException {
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            new Thread(() -> userLogin("user"+ finalI)).start();
+            new Thread(() -> userLoginThenAccessReactorProject("user"+ finalI)).start();
         }
 
-        TimeUnit.SECONDS.sleep(30);
+        //spring.session.timeout is 20s ,  wait for SessionDestroyedEvent error log : Unable to publish SessionDestroyedEvent for session f87...
+        TimeUnit.SECONDS.sleep(32);
     }
 
 
 
-    void userLogin(String userName) {
+    void userLoginThenAccessReactorProject(String userName) {
 
 
 
@@ -65,10 +80,10 @@ public class SessionTest {
        // TimeUnit.SECONDS.sleep(1);
 
         for (int i = 0; i < 10; i++) {
-            new Thread(new MyRunnable( XAuthToken)).start();
+            new Thread(new AccessReactorProjectRunnable( XAuthToken)).start();
         }
 
-        log.info("=======>[{}],access RESTFUL api  in reactor project  immediately ========",userName);
+        log.info("=======>[{}],access RESTFUL api  in reactor project  immediately",userName);
 
 
 
@@ -81,25 +96,30 @@ public class SessionTest {
         Response response = loginClient.login(request);
         Map<String, Collection<String>> headers = response.headers();
         Collection<String> strs = headers.get("X-Auth-Token");
-        String token = strs.iterator().next();
-        return token;
+        return strs.iterator().next();
     }
 
 
 
 
-    private class MyRunnable implements Runnable {
+    private class AccessReactorProjectRunnable implements Runnable {
    //     private CyclicBarrier barrier;
         private String token;
 
-        public MyRunnable(String token) {
+        public AccessReactorProjectRunnable(String token) {
             this.token = token;
         }
 
-        @SneakyThrows
+
         @Override
         public void run() {
-            Response login = redactorClient.userProfile(token);
+            try {
+                //access api from reactor project
+                Response login = reactorClient.userProfile(token);
+            }catch (Exception e){
+                log.error("Error ! reactor project is not run ? {}",e.getMessage());
+            }
+
         }
     }
 }

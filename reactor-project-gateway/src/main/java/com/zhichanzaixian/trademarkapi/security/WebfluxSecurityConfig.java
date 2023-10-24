@@ -36,20 +36,13 @@ import javax.annotation.Resource;
 
 @EnableWebFluxSecurity
 public class WebfluxSecurityConfig {
-    // @Resource
-    // private DefaultAuthorizationManager defaultAuthorizationManager;
 
-    //  @Resource
-    //  private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Resource
     private DefaultAuthenticationSuccessHandler defaultAuthenticationSuccessHandler;
 
     @Resource
     private DefaultAuthenticationFailureHandler defaultAuthenticationFailureHandler;
-
-    //  @Resource
-    // private TokenAuthenticationManager tokenAuthenticationManager;
 
 
     @Resource
@@ -58,11 +51,7 @@ public class WebfluxSecurityConfig {
     @Resource
     private DefaultAccessDeniedHandler defaultAccessDeniedHandler;
 
-    /**
-     * 自定义过滤权限
-     */
-  //  @Value("${security.noFilter}")
-   // private String noFilter;
+
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {

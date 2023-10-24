@@ -31,7 +31,7 @@ public class RestAuthenticationFilter extends UsernamePasswordAuthenticationFilt
             DocumentContext context = JsonPath.parse(is);
             String username = context.read("$.username", String.class);
             String password = context.read("$.password", String.class);
-            log.info("RestAuthenticationFilter::" + username);
+            log.debug("RestAuthenticationFilter::" + username);
             authRequest = new UsernamePasswordAuthenticationToken(username, password);
         } catch (IOException | PathNotFoundException e) {
             log.error("RestAuthenticationFilter", e);
